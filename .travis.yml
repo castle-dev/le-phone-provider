@@ -1,0 +1,21 @@
+language: node_js
+before_install:
+  - npm install -g gulp mocha
+  - npm install
+  - npm test
+install:
+  - 'git config --global user.email "travis-ci@entercastle.com"'
+  - 'git config --global user.name "Travis Castle"'
+script:
+  - gulp docs
+  - cd docs
+  - git init
+  - 'git remote add origin "https://${GH_TOKEN}@github.com/castle-dev/le-phone-service.git"'
+  - git checkout -B gh-pages
+  - git add .
+  - 'git commit -m "Updating documentation"'
+  - 'git push origin gh-pages -fq > /dev/null'
+env:
+  global:
+    - ENVIRONMENT=staging
+    - secure: p5gOcWAB1GbL6rAvUjdluX9ndE21AksUMP7YyHKwus4aeFUcjFOddjrf4bUErtPIyLPWUFVXPpEnEu/HMZodDaquvRIUwM6bexMxJkMmgQidXJGlBn+WqLywLqTA88b0rvT4dcqJg7lqMccvHTlP3APEGttjLtvBbAamtHZfdiPFdjaIXoxvt8a28RD3jVSWZ+4AWbV1ID+PQSMw0VoX1gmXSQUn75bskPmt/47U+mXe8RBQW/3y5aZRsnSUar0BM7hCC2MRITyn4KZonP5yx1rnFZ7lQlcpUXtoZjtcZg0vs4wHIG9ZZmbLUxBvbs7HdX9Bu3qRHZCiwkuAPsL8W5xYJTeX3kLn9fdvbJN7lLhpQclGLFh8RcEBnBJLJ+MqMsatNLZ5Jx9A+b3pepnRXZVk/3fvDP7GbAFOj0gdETrerypRIUCojHTmQJTQVIDy7XCKAGRBxNkV+fJGlTaanjBpWyqPJmZGaEFTShLl7M3VJSSvJl4EMmoVLrqf5fXQ6o6rlxmy6i1GjtcAhq1uVnJ8JLfu+Nspxej+2jnwtfxTnF4gbHZocb2rEY5J46Xxfcjh5Qu4rWrjG7ZcKEf7L2Ch2f6dajCgrXsXtH4jZisuBId7IDeT3rp2a7I9CNQB8wAeVc7QmJc3W4FW2KFQ/YhEFZdYMHogs5nVfukn8JE=

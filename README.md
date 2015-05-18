@@ -1,7 +1,7 @@
 le-phone-service
 =========
 
-**Send calls and texts**
+**Send texts**
 
 ## Installation
 

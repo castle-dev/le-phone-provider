@@ -11,7 +11,7 @@ le-phone-service
 
 ```
   var storage = /* initialize storage service */
-  var provider = /* initialize phone provider (such as [le-phone-provider-twilio](https://github.com/castle-dev/le-phone-provider-twilio)) */
+  var provider = /* initialize phone provider (such as le-phone-provider-twilio) */
   var PhoneService = require('le-phone-service');
   var from = /* your phone number */
   var phone = new PhoneService(provider, storage, from);

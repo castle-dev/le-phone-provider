@@ -1,8 +1,4 @@
 var q = require('q');
-var _queue;
-var _storage;
-var _provider;
-var _from;
 /**
  * A tool for sending texts
  * @class PhoneService
@@ -15,10 +11,49 @@ var PhoneService = function (provider, storage, from) {
   if (!provider) { throw new Error('Phone provider required'); }
   if (!storage) { throw new Error('Instance of le-storage-service required'); }
   if (!from) { throw new Error('From phone number required'); }
+  var _queue = [];
+  var locked = false;
+  var rateLimitDelay = 1000;
+  var _storage;
+  var _provider;
+  var _from;
   _storage = storage;
   _provider = provider;
   _from = from;
-  _queue = [];
+
+  function processQueue () {
+    if (!locked) {
+      if (_queue.length) {
+        locked = true;
+        var text = _queue.shift();
+        var to = text.to;
+        var message = text.message;
+        _provider.text(_from, to, message)
+        .then(function () {
+          var record = _storage.createRecord('Text');
+          return record.update({
+            from: _from,
+            to: to,
+            message: message
+          });
+        })
+        .then(function (record) {
+          next();
+          text.deferred.resolve(record);
+        })
+        .catch(function (err) {
+          next();
+          text.deferred.reject(err);
+        });
+      }
+    }
+  }
+  function next () {
+    setTimeout(function () {
+      locked = false;
+      processQueue();
+    }, rateLimitDelay);
+  }
   /**
    * Sends a text message
    * @function text
@@ -35,39 +70,10 @@ var PhoneService = function (provider, storage, from) {
       message: message,
       deferred: deferred
     });
+    processQueue();
     return deferred.promise;
   };
-}
 
-function processQueue () {
-  setTimeout(function () {
-    if (_queue.length) {
-      var text = _queue.shift();
-      var to = text.to;
-      var message = text.message;
-      _provider.text(_from, to, message)
-      .then(function () {
-        var record = _storage.createRecord('Text');
-        return record.update({
-          from: _from,
-          to: to,
-          message: message
-        });
-      })
-      .then(function (record) {
-        text.deferred.resolve(record);
-        processQueue();
-      })
-      .catch(function (err) {
-        text.deferred.reject(err);
-        processQueue();
-      });
-    } else {
-      processQueue();
-    }
-  }, 1000);
 }
-
-processQueue();
 
 module.exports = PhoneService;

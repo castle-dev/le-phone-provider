@@ -43,13 +43,13 @@ describe('unit tests::', function () {
     }).to.throw('From phone number required');
   });
   it('should send and store texts', function () {
-    return promise = service.text('1011011010', 'Hello')
+    return promise = service.text('1011011010', 'Hello World!')
     .then(function () {
       expect(mockProvider.text.callCount).to.equal(1);
     });
   });
   it('should only send one text per second', function (done) {
-    this.timeout(4000);
+    this.timeout(3000);
     mockProvider =  { text: sinon.stub().resolves() };
     service = new PhoneService(mockProvider, mockStorage, from);
     expect(mockProvider.text.callCount).to.equal(0);
@@ -66,14 +66,14 @@ describe('unit tests::', function () {
       expect(promise3).not.to.have.been.resolved;
       expect(mockProvider.text.callCount).to.equal(1);
       expect(mockProvider.text).to.have.been.calledWith(from, text1.to, text1.message);
-    }, 1500);
+    }, 500);
     setTimeout(function () {
       expect(promise1).to.have.been.resolved;
       expect(promise2).to.have.been.resolved;
       expect(promise3).not.to.have.been.resolved;
       expect(mockProvider.text.callCount).to.equal(2);
       expect(mockProvider.text).to.have.been.calledWith(from, text2.to, text2.message);
-    }, 2500)
+    }, 1500);
     setTimeout(function () {
       expect(promise1).to.have.been.resolved;
       expect(promise2).to.have.been.resolved;
@@ -81,6 +81,41 @@ describe('unit tests::', function () {
       expect(mockProvider.text.callCount).to.equal(3);
       expect(mockProvider.text).to.have.been.calledWith(from, text3.to, text3.message);
       done();
-    }, 3500)
+    }, 2500);
+  });
+  it('should handle new texts being sent while processing', function (done) {
+    this.timeout(4000);
+    mockProvider =  { text: sinon.stub().resolves() };
+    service = new PhoneService(mockProvider, mockStorage, from);
+    expect(mockProvider.text.callCount).to.equal(0);
+    var text1 = { to: '1011011010', message: 'Hello' };
+    var text2 = { to: '0110101011', message: 'World' };
+    var text3 = { to: '1011101010', message: ':]' };
+    var text4 = { to: '1101010101', message: ':P' };
+    var promise1 = service.text(text1.to, text1.message);
+    var promise2 = service.text(text2.to, text2.message);
+    var promise3;
+    var promise4;
+    setTimeout(function () {
+      var resolves = [];
+      // queue 2 new texts while processing the first two
+      promise3 = service.text(text3.to, text3.message);
+      promise4 = service.text(text4.to, text4.message);
+      expect(mockProvider.text.callCount).to.equal(1);
+      expect(mockProvider.text).to.have.been.calledWith(from, text1.to, text1.message);
+    }, 500);
+    setTimeout(function () {
+      expect(mockProvider.text.callCount).to.equal(2);
+      expect(mockProvider.text).to.have.been.calledWith(from, text2.to, text2.message);
+    }, 1500);
+    setTimeout(function () {
+      expect(mockProvider.text.callCount).to.equal(3);
+      expect(mockProvider.text).to.have.been.calledWith(from, text3.to, text3.message);
+    }, 2500);
+    setTimeout(function () {
+      expect(mockProvider.text.callCount).to.equal(4);
+      expect(mockProvider.text).to.have.been.calledWith(from, text4.to, text4.message);
+      done();
+    }, 3500);
   });
 });

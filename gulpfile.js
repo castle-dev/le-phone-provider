@@ -73,4 +73,6 @@ gulp.task('tdd', function (done) {
   runSequence('test:unit', 'watch', done)
 });
 
-gulp.task('test', ['test:unit']);
+gulp.task('test', ['test:unit'], function () {
+  process.exit(0);
+});

@@ -23,6 +23,7 @@
   "devDependencies": {
     "chai": "^2.2.0",
     "chai-as-promised": "^5.0.0",
+    "chai-spies": "^0.7.1",
     "gulp": "^3.8.11",
     "gulp-bump": "^0.3.0",
     "gulp-clean": "^0.3.1",
@@ -37,11 +38,14 @@
     "le-storage-provider-firebase": "^1.0.2",
     "le-storage-service": "^2.0.7",
     "mocha": "^2.2.4",
+    "q": "^1.4.1",
     "run-sequence": "^1.0.2",
     "sinon": "^1.14.1",
     "sinon-as-promised": "^3.0.0",
     "sinon-chai": "^2.7.0",
     "travis-encrypt": "^1.1.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "q": "^1.4.1"
+  }
 }

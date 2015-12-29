@@ -64,21 +64,23 @@ describe('unit tests::', function () {
       expect(promise1).to.have.been.resolved;
       expect(promise2).not.to.have.been.resolved;
       expect(promise3).not.to.have.been.resolved;
+      expect(mockProvider.text.callCount).to.equal(1);
       expect(mockProvider.text).to.have.been.calledWith(from, text1.to, text1.message);
-      setTimeout(function () {
-        expect(promise1).to.have.been.resolved;
-        expect(promise2).to.have.been.resolved;
-        expect(promise3).not.to.have.been.resolved;
-        expect(mockProvider.text).to.have.been.calledWith(from, text2.to, text2.message);
-        setTimeout(function () {
-          expect(promise1).to.have.been.resolved;
-          expect(promise2).to.have.been.resolved;
-          expect(promise3).to.have.been.resolved;
-          expect(mockProvider.text.callCount).to.equal(3);
-          expect(mockProvider.text).to.have.been.calledWith(from, text3.to, text3.message);
-          done();
-        }, 1000)
-      }, 1000)
     }, 1500);
+    setTimeout(function () {
+      expect(promise1).to.have.been.resolved;
+      expect(promise2).to.have.been.resolved;
+      expect(promise3).not.to.have.been.resolved;
+      expect(mockProvider.text.callCount).to.equal(2);
+      expect(mockProvider.text).to.have.been.calledWith(from, text2.to, text2.message);
+    }, 2500)
+    setTimeout(function () {
+      expect(promise1).to.have.been.resolved;
+      expect(promise2).to.have.been.resolved;
+      expect(promise3).to.have.been.resolved;
+      expect(mockProvider.text.callCount).to.equal(3);
+      expect(mockProvider.text).to.have.been.calledWith(from, text3.to, text3.message);
+      done();
+    }, 3500)
   });
 });

@@ -43,13 +43,13 @@ describe('unit tests::', function () {
     }).to.throw('From phone number required');
   });
   it('should send and store texts', function () {
-    return promise = service.text('1011011010', 'Hello')
+    return promise = service.text('1011011010', 'Hello World!')
     .then(function () {
       expect(mockProvider.text.callCount).to.equal(1);
     });
   });
   it('should only send one text per second', function (done) {
-    this.timeout(4000);
+    this.timeout(3000);
     mockProvider =  { text: sinon.stub().resolves() };
     service = new PhoneService(mockProvider, mockStorage, from);
     expect(mockProvider.text.callCount).to.equal(0);
@@ -66,14 +66,14 @@ describe('unit tests::', function () {
       expect(promise3).not.to.have.been.resolved;
       expect(mockProvider.text.callCount).to.equal(1);
       expect(mockProvider.text).to.have.been.calledWith(from, text1.to, text1.message);
-    }, 1500);
+    }, 500);
     setTimeout(function () {
       expect(promise1).to.have.been.resolved;
       expect(promise2).to.have.been.resolved;
       expect(promise3).not.to.have.been.resolved;
       expect(mockProvider.text.callCount).to.equal(2);
       expect(mockProvider.text).to.have.been.calledWith(from, text2.to, text2.message);
-    }, 2500)
+    }, 1500)
     setTimeout(function () {
       expect(promise1).to.have.been.resolved;
       expect(promise2).to.have.been.resolved;
@@ -81,6 +81,6 @@ describe('unit tests::', function () {
       expect(mockProvider.text.callCount).to.equal(3);
       expect(mockProvider.text).to.have.been.calledWith(from, text3.to, text3.message);
       done();
-    }, 3500)
+    }, 2500)
   });
 });

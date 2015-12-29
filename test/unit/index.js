@@ -43,9 +43,42 @@ describe('unit tests::', function () {
     }).to.throw('From phone number required');
   });
   it('should send and store texts', function () {
-    var promise = service.text('1011011010', 'Hello')
-    .then(function (record) { expect(record.update).to.have.been.called });
-    expect(mockProvider.text).to.have.been.called;
-    return expect(promise).to.eventually.be.fulfilled;
+    return promise = service.text('1011011010', 'Hello')
+    .then(function () {
+      expect(mockProvider.text.callCount).to.equal(1);
+    });
+  });
+  it('should only send one text per second', function (done) {
+    this.timeout(4000);
+    mockProvider =  { text: sinon.stub().resolves() };
+    service = new PhoneService(mockProvider, mockStorage, from);
+    expect(mockProvider.text.callCount).to.equal(0);
+    var text1 = { to: '1011011010', message: 'Hello' };
+    var text2 = { to: '0110101011', message: 'World' };
+    var text3 = { to: '1011101010', message: ':]' };
+    var promise1 = service.text(text1.to, text1.message);
+    var promise2 = service.text(text2.to, text2.message);
+    var promise3 = service.text(text3.to, text3.message);
+    setTimeout(function () {
+      var resolves = [];
+      expect(promise1).to.have.been.resolved;
+      expect(promise2).not.to.have.been.resolved;
+      expect(promise3).not.to.have.been.resolved;
+      expect(mockProvider.text).to.have.been.calledWith(from, text1.to, text1.message);
+      setTimeout(function () {
+        expect(promise1).to.have.been.resolved;
+        expect(promise2).to.have.been.resolved;
+        expect(promise3).not.to.have.been.resolved;
+        expect(mockProvider.text).to.have.been.calledWith(from, text2.to, text2.message);
+        setTimeout(function () {
+          expect(promise1).to.have.been.resolved;
+          expect(promise2).to.have.been.resolved;
+          expect(promise3).to.have.been.resolved;
+          expect(mockProvider.text.callCount).to.equal(3);
+          expect(mockProvider.text).to.have.been.calledWith(from, text3.to, text3.message);
+          done();
+        }, 1000)
+      }, 1000)
+    }, 1500);
   });
 });

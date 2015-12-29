@@ -25,8 +25,13 @@ gulp.task('docs', function () {
 gulp.task('test:unit', function () {
   return gulp.src('test/unit/**/*.js', {read: false})
   .pipe(mocha({reporter: 'nyan'}))
-  .on('error', util.log);
+  .on('error', handleError);
 });
+
+function handleError(err) {
+  console.log(err.toString());
+  this.emit('end');
+}
 
 gulp.task('test:e2e', function () {
   return gulp.src('test/e2e/**/*.js', {read: false})

@@ -38,17 +38,21 @@ var PhoneService = function (provider, storage, from) {
           });
         })
         .then(function (record) {
+          next();
           text.deferred.resolve(record);
-          locked = false;
-          setTimeout(processQueue, rateLimitDelay);
         })
         .catch(function (err) {
+          next();
           text.deferred.reject(err);
-          locked = false;
-          setTimeout(processQueue, rateLimitDelay);
         });
       }
     }
+  }
+  function next () {
+    setTimeout(function () {
+      locked = false;
+      processQueue();
+    }, rateLimitDelay);
   }
   /**
    * Sends a text message
